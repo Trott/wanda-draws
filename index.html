@@ -18,6 +18,14 @@
         availableEraserWidths: [1,2,4,8,16,64],
         defaultLineWidth: 8,
         defaultEraserWidth: 8,
+        saveHandler: function (image, done) {
+          console.log(image);
+          const download = document.createElement('a');
+          download.href = image.asDataURL();
+          download.download = image.suggestedFileName();
+          download.click();
+          done(false);
+        }
       }).show()
     </script>
   </body>
