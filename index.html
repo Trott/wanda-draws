@@ -4,11 +4,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="./style.css" />
     <title>Wanda Draws</title> 
   </head>
   <body>
-    <canvas id="canvas"></canvas>
-    <script src="./canvas.js"></script>
+    <script src="./deps/painterro-1.0.35.min.js"></script>
+    <script>
+      Painterro({
+        defaultTool: 'brush',
+        hiddenTools: ['select', 'crop', 'line', 'arrow', 'rect', 'ellipse', 'text', 'rotate', 'resize', 'close', 'pixelize'],
+        how_to_paste_actions: ['paste_over'],
+        availableLineWidths: [1,2,4,8,16,64],
+        availableEraserWidths: [1,2,4,8,16,64],
+        defaultLineWidth: 8,
+        defaultEraserWidth: 8,
+      }).show()
+    </script>
   </body>
 </html>
