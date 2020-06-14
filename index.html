@@ -4,29 +4,86 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Wanda Draws</title> 
+    <title>Wanda Draws</title>
+    <style>
+      body { background: #f3f3f3 }
+      .outer { width: 100% } 
+      .inner { margin: 0 auto; width: 30% }
+      .progress { width: 100% }
+      .button-group { text-align: center; width: 100%; height: 2rem; }
+      .whatisit-results { position:absolute; top: 0; left: 0; }
+      #painterro-wrapper { top: 5rem }
+      #painterro-bar { left: 0 }
+    </style>
   </head>
   <body>
+    <div class="outer">
+      <div class="inner">
+        <div id="button-group" class="button-group">
+          <button disabled id="whatisit-button">What&nbsp;is&nbsp;it?</button>
+          <button disabled id="startover-button">Start&nbsp;over</button>
+        </div>
+        <div id="whatisit-results" class="whatisit-results"></div>
+        <progress id="progress" class="progress"></progress>
+      </div>
+    </div>
+    
+    <div class="outer">
+      <div class="inner">
+        <div id="painterro"></div>
+      </div>
+    </div>
     <script src="./deps/painterro-1.0.35.min.js"></script>
+    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
     <script>
-      Painterro({
+      const classifier = ml5.imageClassifier('MobileNet', modelLoaded);
+      const ptro = Painterro({
+        id: 'painterro',
         activeColor: '#000000',
         defaultTool: 'brush',
-        hiddenTools: ['select', 'crop', 'line', 'arrow', 'rect', 'ellipse', 'text', 'rotate', 'resize', 'close', 'pixelize'],
+        hiddenTools: ['select', 'crop', 'line', 'arrow', 'rect', 'ellipse', 'text', 'rotate', 'resize', 'close', 'pixelize', 'settings'],
         how_to_paste_actions: ['paste_over'],
         availableLineWidths: [1,2,4,8,16,64],
         availableEraserWidths: [1,2,4,8,16,64],
         defaultLineWidth: 8,
         defaultEraserWidth: 8,
         saveHandler: function (image, done) {
-          console.log(image);
           const download = document.createElement('a');
           download.href = image.asDataURL();
           download.download = image.suggestedFileName();
           download.click();
           done(false);
         }
-      }).show()
+      });
+
+      function modelLoaded() {
+        const startover = document.getElementById('startover-button');
+        const whatisit = document.getElementById('whatisit-button');
+        const whatisitResults = document.getElementById('whatisit-results');
+        document.getElementById('progress').setAttribute('style', 'display: none');
+        startover.addEventListener('click', () => {
+          whatisitResults.innerHTML = ''
+          ptro.show();
+        })
+        whatisit.addEventListener('click', () => {
+          whatisit.disabled = true;
+          classifier.classify(document.getElementById(`${ptro.id}-canvas`), (err, results) => {
+            if (err) {
+              return whatisitResults.innerHTML = `<p>${err.toString()}</p>`;
+            }
+            let resultsHtml = '<ul>';
+            for (let result of results) {
+              resultsHtml += `<li>${result.label}: ${result.confidence}</li>`;
+            }
+            resultsHtml += '</ul';
+            whatisitResults.innerHTML = resultsHtml;
+            whatisit.disabled = false;
+          });
+        });
+        startover.disabled = false;
+        whatisit.disabled = false;
+        ptro.show();
+      }
     </script>
   </body>
 </html>
